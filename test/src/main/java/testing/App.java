@@ -25,36 +25,37 @@ public class App
         return res;
     }
 
-    public static BigDecimal[] getPQ(BigDecimal phi, MathContext mc)
+    public static BigDecimal[] getPQ(BigDecimal dg, BigDecimal k, MathContext mc) throws Exception
     {
         BigDecimal[] res = new BigDecimal[2];
-        BigDecimal b = n.subtract(phi).add(BigDecimal.ONE).negate();
-        BigDecimal rt = b.pow(2).subtract(n.multiply(BigDecimal.valueOf(4.0))).sqrt(mc);
 
-        res[0] = b.negate().add(rt).divide(BigDecimal.valueOf(2.0));
-        res[1] = b.negate().subtract(rt).divide(BigDecimal.valueOf(2.0));
+        BigDecimal phi = e.multiply(dg).divideToIntegralValue(k);
+        if(phi.intValue() == 0) throw new Exception();
+        BigDecimal g = e.multiply(dg).remainder(k);
 
+        BigDecimal test = n.subtract(phi).add(BigDecimal.ONE).divide(BigDecimal.valueOf(2.0));
+        System.out.println(test);
+        if(test.doubleValue() != test.intValue())
+        {
+            throw new Exception();
+        }
+
+        res[0] = test.multiply(test).subtract(n).sqrt(mc).add(test);
+        res[1] = n.divide(res[0], mc);
         return res;
-    }
-
-    public static BigDecimal getPhi(BigDecimal d, BigDecimal k)
-    {
-        return e.multiply(d).subtract(BigDecimal.ONE).divide(k);
     }
 
     public static void main( String[] args )
     {
-        MathContext mc = new MathContext(120);
+        MathContext mc = new MathContext(500);
      
-        String n_hex = bigRand(100);
-        BigInteger eI = new BigInteger("10001", 16);
+        String n_hex = "c2cbb24fdbf923b61268e3f11a3896de4574b3ba58730cbd652938864e2223eeeb704a17cfd08d16b46891a61474759939c6e49aafe7f2595548c74c1d7fb8d24cd15cb23b4cd0a3";//bigRand(100);
+        String e_hex = "1001";
+        BigInteger eI = new BigInteger(e_hex, 16);
         BigInteger nI = new BigInteger(n_hex, 16);
 
         n = new BigDecimal(nI, 0);
         e = new BigDecimal(eI, 0);
-        
-        System.out.println(n);
-        System.out.println(e);
 
         BigDecimal rem = n.remainder(e, mc);
         BigDecimal div = e;
@@ -62,6 +63,7 @@ public class App
 
         BigDecimal[] vals = new BigDecimal[100];
         vals[0] = n.divideToIntegralValue(e);
+        System.out.println(vals[0]);
         int ind = 1;
 
         while(rem.intValue() != 0)
@@ -80,7 +82,7 @@ public class App
         {   
             if(vals[i] != null)
             {
-                BigDecimal div1 = vals[i];
+                BigDecimal div1 = ((i+1) % 2 == 0)?vals[i].add(BigDecimal.ONE):vals[i];
                 BigDecimal div2 = BigDecimal.ONE;
             
                 for(int u = i-1; u >= 0; u--)
@@ -92,8 +94,12 @@ public class App
                 
                 System.out.println(div2+"/"+div1);
                 try {
-                    BigDecimal[] pq = getPQ(getPhi(div1, div2), mc);
-                    System.out.println(pq[0]+",  "+pq[1]);
+                    //BigDecimal[] pq = getPQ(div1, div2, mc);
+                    if(BigInteger.TWO.modPow(div1.multiply(e).toBigInteger(), n.toBigInteger()).intValue() == 2)
+                    {
+                        System.out.println("------"+div1);
+                    }
+                    //System.out.println(pq[0]+", "+pq[1]);
                 } catch(Exception e) {
                     System.out.println("No factors!");
                 }
