@@ -2,6 +2,7 @@ package ModTest;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Hello world!
@@ -9,6 +10,7 @@ import java.util.ArrayList;
  */
 public class App 
 {
+    public static HashMap<Integer, ArrayList<Integer[]>> pers = new HashMap<>();
 
     public static void checkRSACreation() {
         BigInteger p = new BigInteger("3"), q = new BigInteger("5");
@@ -52,7 +54,7 @@ public class App
 
     public static void main(String[] args) {
         for (int i = 3; i < 10; i++) {
-            for (int u = 3; u < 10; u++) {
+            for (int u = i; u < 10; u++) {
                 if (i != u) checkPrimes(BigInteger.valueOf(getPrime(i)), BigInteger.valueOf(getPrime(u)));
             }
         }
@@ -104,6 +106,13 @@ public class App
                 System.out.println(-1);
                 break;
             }
+        }
+
+        Integer[] vals = {per0, period, d.intValue()};
+        if (pers.containsKey(per0)) pers.get(per0).add(vals);
+        else {
+            pers.put(per0, new ArrayList<Integer[]>());
+            pers.get(per0).add(vals);
         }
         System.out.println(per0+",  "+period);
     }
